@@ -7,7 +7,7 @@
 #include "func.h"
 
 
-extern const int SIZE_STRING;
+// extern const int SIZE_STRING;
 
 // ====================================================================
 //  HELPER FUNCTIONS DECLARATION

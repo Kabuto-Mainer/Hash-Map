@@ -5,7 +5,7 @@
 #include "func.h"
 
 constexpr int SIZE_TABLE = 5000;
-constexpr int SIZE_STRING = 32;
+// constexpr int SIZE_STRING = 32;
 constexpr char DATA_FILE[] = "Data/2.txt";
 constexpr char DUMP_FILE[] = "dump.txt";
 
