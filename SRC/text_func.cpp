@@ -42,7 +42,7 @@ int KDS_HM_DumpText(KDS_HashMap *map, const char *file) {
 
         KDS_HashMapList *list = &(map->data[i]);
         while (true) {
-            if (list->string == NULL) {
+            if (list->string[0] == '\0') {
                 fprintf(stream, "nil");
             } else {
                 fprintf(stream, "[\"%s\"{" KDS_COUNT_PRINT_SPEC
@@ -77,7 +77,7 @@ int KDS_HM_DumpDat(KDS_HashMap *map, const char *file) {
         int counter = 0;
 
         while (true) {
-            if (list->string == NULL) {
+            if (list->string[0] == '\0') {
                 counter = 0;
                 break;
             }

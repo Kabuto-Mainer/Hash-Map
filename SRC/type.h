@@ -9,7 +9,7 @@ typedef uint64_t KDS_Count;
 #define KDS_HASH_PRINT_SPEC "%lu"
 #define KDS_COUNT_PRINT_SPEC "%lu"
 
-extern const int SIZE_STRING;
+constexpr int SIZE_STRING = 32;
 
 enum KDS_HashMapErrorFlag {
     KDS_HM_ERROR_NOT = 0x0000,
@@ -19,7 +19,7 @@ enum KDS_HashMapErrorFlag {
 
 struct KDS_HashMapList {
     KDS_Hash hash_list;
-    char string;
+    char string[SIZE_STRING];
 
     KDS_Count counter;
     KDS_HashMapList *next;

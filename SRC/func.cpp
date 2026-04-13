@@ -13,6 +13,8 @@ extern const int SIZE_STRING;
 //  HELPER FUNCTIONS DECLARATION
 static void kds_hm_destroy_list(KDS_HashMapList *list);
 static KDS_HashMapList *kds_hm_allocate_list(void);
+bool kds_hm_cmp_string(const char *first, const char *second);
+
 
 #ifdef VERIFIERs
 static int kds_hm_verifier(KDS_HashMap *map);
@@ -31,7 +33,20 @@ static int kds_hm_verifier_list(KDS_HashMapList *list, KDS_Hash (*hash_list)(con
             KDS_Hash (*hash_cell)(const char *), int size);
 #endif /* VERIFIER */
 
+// ====================================================================
+bool kds_hm_cmp_string(const char *first, const char *second) {
+    assert(first);
+    assert(second);
 
+    printf("First: %s\nSecond: %s\n", first, second);
+    // const int64_t *f = (const int64_t *)first;
+    // const int64_t *s = (const int64_t *)second;
+
+    for (size_t i = 0; i < (int64_t) SIZE_STRING / sizeof(int64_t); i++) {
+        if (f[i] != s[i])   return 1;
+    }
+    return 0;
+}
 
 // ====================================================================
 // HASH FUNCTIONS
@@ -124,17 +139,25 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string) {
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
     int error = -1;
 
-    // printf("ADD STRING 2\n");
-    if (list->string == NULL) {
+    if (strlen(string) >= SIZE_STRING) {
+        ExitF("Too Big String", -1);
+    }
+
+    printf("STR: %s\n", string);
+    if (list->string[0] == '\0') {
+        printf("INIT\n\n");
         list->hash_list = hash_list;
-        list->string = strdup(string);
+
+        memset(list->string, 0, sizeof(list->string));
+        strcpy(list->string, string);
+
         list->counter = 1;
         list->next = NULL;
         return 0;
     }
 
     while (true) {
-        if (list->hash_list == hash_list && strcmp(list->string, string) == 0) {
+        if (list->hash_list == hash_list && kds_hm_cmp_string(list->string, string) == 0) {
             list->counter++;
             error = 0;
             break;
@@ -151,8 +174,11 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string) {
         };
 
         list->hash_list = hash_list;
+
+        memset(list->string, 0, sizeof(list->string));
+        strcpy(list->string, string);
+
         list->counter = 1;
-        list->string = strdup(string);
         list->next = NULL;
 
         error = 0;
@@ -190,7 +216,7 @@ KDS_HashMapList *KDS_HM_FindString(KDS_HashMap *map, const char *string) {
     KDS_HashMapList *value = NULL;
 
     while (true) {
-        if (list->hash_list == hash_list && strcmp(list->string, string) == 0) {
+        if (list->hash_list == hash_list && kds_hm_cmp_string(list->string, string) == 0) {
             value = list;
             break;
         }
@@ -229,7 +255,8 @@ static void kds_hm_destroy_list(KDS_HashMapList *list) {
 
     if (list->next != NULL) kds_hm_destroy_list(list->next);
 
-    free(list->string);
+    // free(list->string);
+    free(list);
 
     return ;
 }
