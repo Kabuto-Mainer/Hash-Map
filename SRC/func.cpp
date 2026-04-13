@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <nmmintrin.h>
+#include <immintrin.h>
 
 #include "type.h"
 #include "func.h"
@@ -26,7 +26,9 @@
     Соответственно при сравнениях этот байт использовать будет нельзя.
 
     Важно!  В хеш функции не должно быть вычисления длины, по крайней мере ради заполнения байта длины.
-    При сравнении этот бит отбрасывается
+    При сравнении этот бит отбрасывается.
+
+    Для ускорения реализации в условиях отсутствия поддержки AVX_512 максимальная длина поддерживаемой строчки - 31 байт (+ '\0').
 */
 
 constexpr int SUPPORTED_SIZE_STRING = 31;
@@ -79,19 +81,12 @@ static int kds_hm_verifier_list(KDS_HashMapList *list, int size);
 KDS_Hash own_cell_hash(const char *string) {
     assert(string);
 
-    KDS_Hash hash = (KDS_Hash) string[0];
+    KDS_Hash hash = 0x02B2AE3D27D4EB4Fll;
     int idx = 0;
 
-    // constexpr KDS_Hash len = (sizeof(KDS_Hash) * 8) - 8;
-    constexpr KDS_Hash len = (sizeof(KDS_Hash) * 8) - 1;
-
     while (string[idx] != '\0') {
-        // hash = (hash << 8) | (hash >> len);
-        // hash ^= (KDS_Hash) _mm_crc32_u8((unsigned int)string[idx++], POLINOM);
-        hash = (hash >> 1) | (hash << len);
-        hash ^= hash >> 33;
-        hash *= 0xff51afd7ed588ccd;
-        hash ^= (KDS_Hash) string[idx++];
+        hash *= 129;
+        hash += (KDS_Hash) string[idx++];
     }
 
     return hash;
@@ -100,13 +95,44 @@ KDS_Hash own_cell_hash(const char *string) {
 KDS_Hash own_list_hash(const char *string) {
     assert(string);
 
-    KDS_Hash hash = 5137;
-    size_t len = strlen(string);
+    KDS_Hash hash = 0x082EFA98EC4E6C89ul;
+    int idx = 0;
 
-    for (size_t i = 0; i < len; i++) {
-        hash += (KDS_Hash) string[i];
+    while (string[idx] != '\0') {
         hash *= 33;
+        hash += (KDS_Hash) string[idx++];
     }
+
+
+
+//     /* Load Value */
+//     __m256i str_v = _mm256_loadu_si256((const __m256i*)string);
+//
+//     /* Get Mask */
+//     __m256i mask_v = _mm256_set1_epi8(0);
+//     mask_v = _mm256_cmpeq_epi8(str_v, mask_v);
+//     int mask_c = _mm256_movemask_epi8(mask_v);
+//
+//     /* Hash Value */
+//     __m256i mixer_1 = _mm256_set1_epi64x(0x082EFA98EC4E6C89ll);
+//     __m256i mixer_2 = _mm256_set1_epi64x((int64_t) 0xC2B2AE3D27D4EB4Fll);
+//
+//     str_v = _mm256_xor_si256(str_v, mixer_1);
+//     str_v = _mm256_add_epi8(str_v, mixer_2);
+//     str_v = _mm256_xor_si256(str_v, mixer_1);
+//
+//     alignas(32) uint8_t bytes[32] = {};
+//     _mm256_store_si256((__m256i*)bytes, str_v);
+//
+//     KDS_Hash hash = 0xA4093822299F31D0ul;
+//     constexpr KDS_Hash len = (sizeof(KDS_Hash) * 8) - 7;
+//
+//     int i = 0;
+//     while (i < 32 && (mask_c & 1) == 0) {
+//         hash ^= (uint64_t)bytes[i++];
+//         hash = (hash >> 7) | (hash << len);
+//         mask_c >>= 1;
+//     }
 
     return hash;
 }
@@ -231,7 +257,7 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
 
     KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
     KDS_Hash hash_list = kds_hm_get_list_hash(string);
-    // uint8_t len = hl_get_len(hash_list);
+    uint8_t len = hl_get_len(hash_list);
     hash_list = hl_get_hash(hash_list);
 
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
@@ -239,7 +265,7 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
     if (list->string == NULL)   return value;
 
     while (true) {
-        if (hl_get_hash(list->hash_list) == hash_list && strcmp(list->string, string)/*KDS_HM_CmpString(list->string, string, len)*/ == 0) {
+        if (hl_get_hash(list->hash_list) == hash_list && KDS_HM_CmpString(list->string, string, len) == 0) {
             value = list;
             break;
         }

@@ -1,0 +1,172 @@
+# callgrind format
+version: 1
+creator: callgrind-3.25.1
+pid: 141517
+cmd:  ./mon
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 22347353
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(1) /home/kabuto/Programming/HashMap/mon
+fl=(3) /home/kabuto/Programming/HashMap/SRC/func.cpp
+fn=(8) own_cell_hash(char const*)
+86 543415
++4 1086830
+-4 1086830
++7 2173660
+-2 543415
+-1 543415
++1 543415
++1 1086830
++1 543415
++1 543415
+-4 1630245
++1 1661882
+-1 1661882
++1 1661882
++1 3323764
++1 1661882
++1 1661882
+-4 4985646
++41 543415
+
+fn=(6) KDS_HM_FindString32(KDS_HashMap*, char const*)
+288 1086830
++8 543415
+-8 2717075
++8 543415
+cfn=(8)
+calls=543415 86 
+* 27487120
++5 2717075
++2 1086830
++3 543415
+-9 1630245
+cfn=(10) own_list_hash(char const*)
+calls=543415 133 
+* 35062756
+42 543415
+297 543415
+42 543415
+306 10592372
++4 7902615
+-7 529527
++15 3803905
+-12 2173648
+cfi=(4) /home/kabuto/Programming/HashMap/SRC//SRC/CmpString.asm
+cfn=(12) 0x0000000000002160
+calls=543412 144 
+* 4351774
+* 1100712
+
+fn=(10)
+133 543415
+fi=(5) /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/avx2intrin.h
+233 543415
+fe=(3)
+133 1630245
+fi=(6) /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/avxintrin.h
+873 543415
+fe=(3)
+133 1630245
+fi=(5)
+435 1086830
+fe=(3)
+164 543415
+fi=(5)
++69 543415
+435 543415
+915 1086830
+107 543415
+915 543415
+fi=(6)
+-48 543415
+fe=(3)
+168 543415
++1 2205238
+-1 2205238
++3 2205238
+-2 2205238
++1 2205238
+-2 9907776
++8 3260490
+
+fl=(2) /home/kabuto/Programming/HashMap/SRC/text_func.cpp
+fn=(2) KDS_TC_SetWord(KDS_TextContext*, int)
+123 2
++2 1
++1 1
++1 1
+
+fn=(4) KDS_TC_GetNextWord(KDS_TextContext*)
+195 543415
++3 543415
+-3 1086830
++1 2173660
++3 1086830
+
+fl=(4)
+fn=(12)
+144 543412
++1 543412
++1 543412
++2 110519
++1 110519
++2 110519
++1 110519
++1 110519
++1 110519
++2 110519
++1 110519
++2 110519
++1 110519
++2 13888
++1 13888
++3 529524
++1 529524
++1 529524
+
+fl=(1) /home/kabuto/Programming/HashMap/SRC/main.cpp
+fn=(0) main
+34 2
+-3 2
++3 1
+cfi=(2)
+cfn=(2)
+calls=1 +89 
+* 5
++5 6
++1 1
+-1 1
++1 1
+cfi=(2)
+cfn=(4)
+calls=1 195 
+* 10
+* 543414
+-1 543414
++1 543414
+cfi=(2)
+cfn=(4)
+calls=543414 195 
+* 5434140
++1 1630245
+cfi=(3)
+cfn=(6)
+calls=543415 288 
+* 105502974
+* 543415
+-2 1086830
+
+totals: 115827875
