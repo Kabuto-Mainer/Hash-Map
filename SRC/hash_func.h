@@ -4,8 +4,15 @@
 #include "type.h"
 #include "func.h"
 
+#ifndef INLINE
 NOT_INLINE KDS_Hash own_cell_hash(const char *string);
 NOT_INLINE KDS_Hash own_list_hash(const char *string);
+#else /* INLINE */
+KDS_Hash own_cell_hash(const char *string);
+KDS_Hash own_list_hash(const char *string);
+#endif /* INLINE */
+
+
 
 constexpr KDS_Hash (* kds_hm_get_cell_hash)(const char *string) = &own_cell_hash;
 constexpr KDS_Hash (* kds_hm_get_list_hash)(const char *string) = &own_list_hash;

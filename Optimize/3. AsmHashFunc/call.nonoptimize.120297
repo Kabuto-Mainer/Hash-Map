@@ -1,0 +1,139 @@
+# callgrind format
+version: 1
+creator: callgrind-3.25.1
+pid: 120297
+cmd:  ./mon
+part: 1
+
+
+desc: I1 cache:
+desc: D1 cache:
+desc: LL cache:
+
+desc: Timerange: Basic block 0 - 17193279
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(2) /usr/lib/libc.so.6
+fl=(6) ???
+fn=(16) __strcmp_avx2
+0 12523633
+
+fn=(12) __strlen_avx2
+0 7619777
+
+ob=(1) /home/kabuto/Programming/HashMap/mon
+fl=(2) /home/kabuto/Programming/HashMap/SRC/text_func.cpp
+fn=(2) KDS_TC_SetWord(KDS_TextContext*, int)
+123 2
++2 1
++1 1
++1 1
+
+fn=(6) KDS_TC_GetNextWord(KDS_TextContext*)
+195 543415
++3 543415
+-3 1086830
++1 2173660
++3 1086830
+
+fl=(4) /home/kabuto/Programming/HashMap/SRC/func.cpp
+fn=(8) KDS_HM_FindString32(KDS_HashMap*, char const*)
+224 3803905
+82 543415
++6 1086830
+-6 1086830
++11 543415
+-11 2748712
++9 1661882
+-3 1661882
++6 1661882
+-3 1661882
++1 4985646
++1 1661882
++1 1661882
+-6 4985646
++3 543415
+-3 543415
++6 543415
+-3 543415
++1 1630245
++1 543415
++1 543415
+-6 1630245
++16 1086830
+cob=(2)
+cfi=(6)
+cfn=(12)
+calls=543415 0
+* 7619777
+* 543415
++2 2173660
+-3 2173660
++4 543415
+-1 543415
++1 543415
++1 1630245
+-2 1086830
++1 1661882
+-1 1661882
++1 1661882
++1 4985646
+-2 3323764
+237 3803905
++2 1086830
++3 5179803
+cob=(2)
+cfi=(6)
+cfn=(16)
+calls=543412 0
+* 12523633
+* 543412
+* 1086824
++4 624378
++8 3803905
+
+fl=(1) /home/kabuto/Programming/HashMap/SRC/main.cpp
+fn=(0) main
+34 2
+-3 2
++3 1
+cfi=(2)
+cfn=(2)
+calls=1 +89
+* 5
+fi=(3) /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/ia32intrin.h
++80 2
+fe=(1)
+-75 1
+fi=(3)
++75 2
+fe=(1)
+-75 5
++1 1
+-1 1
++1 1
+cfi=(2)
+cfn=(6)
+calls=1 195
+* 10
+* 543414
+-1 543414
++1 543414
+cfi=(2)
+cfn=(6)
+calls=543414 195
+* 5434140
++1 1630245
+cfi=(4)
+cfn=(8)
+calls=543415 224
+* 96169079
+* 543415
+-2 1086830
+
+totals: 106493984

@@ -2,10 +2,51 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <nmmintrin.h>
 
 #include "type.h"
 #include "func.h"
 #include "hash_func.h"
+
+/*
+    Немного об устройстве хеш-таблицы
+
+    Пока предполагается хранить в таблице строки длинной либо меньше 32, либо 64 символов.
+    Более длинные пока не обрабатывать, в дальнейшем хранить их в массивах.
+
+    У каждой строки есть 2 различных хеша:
+        Хеш ячейки, по которому происходит адресация в таблице
+        Хеш списка, по которому идет сравнение в списках
+
+    У хеша списка для ускорения сравнения будет одна особенность.
+    Один старший байт (из 8 возможных) будет выделен для хранения длины строки.
+    Благодаря этому можно производить быстрое сравнение строк длинной до 31/63 байтов,
+    используя векторные инструкции.
+
+    Соответственно при сравнениях этот байт использовать будет нельзя.
+
+    Важно!  В хеш функции не должно быть вычисления длины, по крайней мере ради заполнения байта длины.
+    При сравнении этот бит отбрасывается
+*/
+
+constexpr int SUPPORTED_SIZE_STRING = 31;
+constexpr KDS_Hash HASH_LIST_LEN_MASK = (KDS_Hash) 0xFF << ((sizeof(KDS_Hash) - 1) * 8);
+constexpr KDS_Hash HASH_LIST_HASH_MASK = ~HASH_LIST_LEN_MASK;
+
+extern "C" int KDS_HM_CmpString(const char *str_from_hm, const char *out_string, uint8_t len_hm);
+
+// ====================================================================
+static inline uint8_t hl_get_len(const KDS_Hash hash) {
+    return (uint8_t) ((hash & HASH_LIST_LEN_MASK) >> ((sizeof(KDS_Hash) - 1) * 8));
+}
+
+static inline KDS_Hash hl_get_hash(const KDS_Hash hash) {
+    return hash & HASH_LIST_HASH_MASK;
+}
+
+static inline KDS_Hash hl_set_len(const KDS_Hash in_hash, const uint8_t len) {
+    return ((KDS_Hash) len) << ((sizeof(KDS_Hash) - 1) * 8) | hl_get_hash(in_hash);
+}
 
 
 // ====================================================================
@@ -27,11 +68,11 @@ static int kds_hm_verifier(KDS_HashMap *map);
  * @param size Size of Hash Map
  * @return int Value with bits from KDS_HashMapErrorFlag
  */
-static int kds_hm_verifier_list(KDS_HashMapList *list, KDS_Hash (*hash_list)(const char *),
-            KDS_Hash (*hash_cell)(const char *), int size);
+static int kds_hm_verifier_list(KDS_HashMapList *list, int size);
 #endif /* VERIFIER */
 
 
+// constexpr unsigned char POLINOM =  0x1D;
 
 // ====================================================================
 // HASH FUNCTIONS
@@ -41,12 +82,15 @@ KDS_Hash own_cell_hash(const char *string) {
     KDS_Hash hash = (KDS_Hash) string[0];
     int idx = 0;
 
+    // constexpr KDS_Hash len = (sizeof(KDS_Hash) * 8) - 8;
     constexpr KDS_Hash len = (sizeof(KDS_Hash) * 8) - 1;
+
     while (string[idx] != '\0') {
+        // hash = (hash << 8) | (hash >> len);
+        // hash ^= (KDS_Hash) _mm_crc32_u8((unsigned int)string[idx++], POLINOM);
+        hash = (hash >> 1) | (hash << len);
         hash ^= hash >> 33;
-        hash = (hash << 1) | (hash >> len);
         hash *= 0xff51afd7ed588ccd;
-        // hash = (hash >> 1) | (hash << len);
         hash ^= (KDS_Hash) string[idx++];
     }
 
@@ -109,15 +153,24 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string) {
     if (kds_hm_verifier(map) != 0)  ExitF("Incorrect Hash Map", -1);
 #endif /* VERIFIER */
 
+    /* Get All Hash */
     KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
     KDS_Hash hash_list = kds_hm_get_list_hash(string);
 
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
     int error = -1;
 
-    // printf("ADD STRING 2\n");
+    /* Check Len */
+    size_t len_string = strlen(string);
+    if (len_string > SUPPORTED_SIZE_STRING) {
+        ExitF("Too Big String", -1);
+    }
+    hash_list = hl_get_hash(hash_list);
+    KDS_Hash hash_list_with_len = hl_set_len(hash_list, (uint8_t) len_string);
+
+    /* If it first string in sell */
     if (list->string == NULL) {
-        list->hash_list = hash_list;
+        list->hash_list = hash_list_with_len;
         list->string = strdup(string);
         list->counter = 1;
         list->next = NULL;
@@ -125,7 +178,7 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string) {
     }
 
     while (true) {
-        if (list->hash_list == hash_list && strcmp(list->string, string) == 0) {
+        if (hl_get_hash(list->hash_list) == hash_list && strcmp(list->string, string) == 0) {
             list->counter++;
             error = 0;
             break;
@@ -141,9 +194,11 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string) {
             break;
         };
 
-        list->hash_list = hash_list;
+        list->hash_list = hash_list_with_len;
         list->counter = 1;
         list->string = strdup(string);
+
+        if (list->string == NULL)   ExitF("NULL strdup", -1);
         list->next = NULL;
 
         error = 0;
@@ -166,7 +221,7 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string) {
  * @return KDS_HashMapList* Pointer to List with needed String on success
  * @return KDS_HashMapList* NULL on error
  */
-KDS_HashMapList *KDS_HM_FindString(KDS_HashMap *map, const char *string) {
+KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
     assert(map);
     assert(string);
 
@@ -176,12 +231,15 @@ KDS_HashMapList *KDS_HM_FindString(KDS_HashMap *map, const char *string) {
 
     KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
     KDS_Hash hash_list = kds_hm_get_list_hash(string);
+    // uint8_t len = hl_get_len(hash_list);
+    hash_list = hl_get_hash(hash_list);
 
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
     KDS_HashMapList *value = NULL;
+    if (list->string == NULL)   return value;
 
     while (true) {
-        if (list->hash_list == hash_list && strcmp(list->string, string) == 0) {
+        if (hl_get_hash(list->hash_list) == hash_list && strcmp(list->string, string)/*KDS_HM_CmpString(list->string, string, len)*/ == 0) {
             value = list;
             break;
         }
@@ -206,7 +264,12 @@ int KDS_HM_Destroy(KDS_HashMap *map) {
     assert(map);
 
     for (int i = 0; i < map->size; i++) {
-        kds_hm_destroy_list(&(map->data[i]));
+        // printf("I=%d\n", i);
+        KDS_HashMapList *list = &(map->data[i]);
+        if (list->next) {
+            kds_hm_destroy_list(list->next);
+        }
+        if (list->string)   free(list->string);
     }
     free(map->data);
 
@@ -218,9 +281,13 @@ int KDS_HM_Destroy(KDS_HashMap *map) {
 static void kds_hm_destroy_list(KDS_HashMapList *list) {
     assert(list);
 
-    if (list->next != NULL) kds_hm_destroy_list(list->next);
+    if (list->next) kds_hm_destroy_list(list->next);
 
-    free(list->string);
+    // printf("STR: %p\nLIST: %p\n", list->string, list);
+    if (list->string) {
+        free(list->string);
+    }
+    free(list);
 
     return ;
 }
@@ -275,10 +342,11 @@ static int kds_hm_verifier_list(KDS_HashMapList *list, int size) {
     KDS_Hash needed_hash_cell = kds_hm_get_cell_hash(list->string);
 
     while (true) {
-        KDS_Hash hash_l = kds_hm_get_list_hash(list->string);
         KDS_Hash hash_c = kds_hm_get_cell_hash(list->string);
+        KDS_Hash hash_l = kds_hm_get_list_hash(list->string);
+        hash_l = hl_get_hash(hash_l);
 
-        if (hash_l != list->hash_list) {
+        if (hash_l != hl_get_hash(list->hash_list)) {
             error |= KDS_HM_ERROR_BAD_HASH_LIST;
             // printf("%s\n", list->string);
         }

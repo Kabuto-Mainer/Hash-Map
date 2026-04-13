@@ -30,6 +30,7 @@ do {printf("ERROR in %s:%d||%s\n", __FILE__,__LINE__,__text__); \
  * @return int -1 on error
  */
 int KDS_HM_Create(KDS_HashMap *map, int size);
+
 // --------------------------------------------------------------------
 /**
  * @brief Add String to Hash Map
@@ -40,6 +41,7 @@ int KDS_HM_Create(KDS_HashMap *map, int size);
  * @return int -1 on error
  */
 int KDS_HM_AddString(KDS_HashMap *map, const char *string);
+
 // --------------------------------------------------------------------
 /**
  * @brief Find String in Hash Map
@@ -48,9 +50,11 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string);
  * @param string Finding String
  * @return KDS_HashMapList* Pointer to List with needed String on success
  * @return KDS_HashMapList* NULL on error
+ * @note Len of Finding String must be less 32 byte
  */
+KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string);
+
 // --------------------------------------------------------------------
-KDS_HashMapList *KDS_HM_FindString(KDS_HashMap *map, const char *string);
 /**
  * @brief Destroy Hash Map
  *
