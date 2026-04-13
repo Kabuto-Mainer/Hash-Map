@@ -5,16 +5,16 @@
 
 #include "type.h"
 #include "func.h"
+#include "hash_func.h"
 
-
-// extern const int SIZE_STRING;
 
 // ====================================================================
 //  HELPER FUNCTIONS DECLARATION
 static void kds_hm_destroy_list(KDS_HashMapList *list);
 static KDS_HashMapList *kds_hm_allocate_list(void);
 
-#ifdef VERIFIERs
+
+#ifdef VERIFIER
 static int kds_hm_verifier(KDS_HashMap *map);
 
 // --------------------------------------------------------------------
@@ -35,10 +35,9 @@ static int kds_hm_verifier_list(KDS_HashMapList *list, KDS_Hash (*hash_list)(con
 
 // ====================================================================
 // HASH FUNCTIONS
-KDS_Hash kds_hm_get_cell_hash(const char *string) {
+KDS_Hash own_cell_hash(const char *string) {
     assert(string);
 
-    // return strlen(string);
     KDS_Hash hash = (KDS_Hash) string[0];
     int idx = 0;
 
@@ -50,18 +49,11 @@ KDS_Hash kds_hm_get_cell_hash(const char *string) {
         // hash = (hash >> 1) | (hash << len);
         hash ^= (KDS_Hash) string[idx++];
     }
-//     KDS_Hash hash = 1387;
-//     size_t len = strlen(string);
-//
-//     for (size_t i = 0; i < len; i++) {
-//         hash += (KDS_Hash) string[i];
-//         hash *= 33;
-//     }
 
     return hash;
 }
 // --------------------------------------------------------------------
-KDS_Hash kds_hm_get_list_hash(const char *string) {
+KDS_Hash own_list_hash(const char *string) {
     assert(string);
 
     KDS_Hash hash = 5137;
@@ -74,6 +66,7 @@ KDS_Hash kds_hm_get_list_hash(const char *string) {
 
     return hash;
 }
+
 
 // ====================================================================
 // API FUNCTIONS
@@ -94,8 +87,6 @@ int KDS_HM_Create(KDS_HashMap *map, int size) {
     map->data = (KDS_HashMapList *)calloc((size_t) size, sizeof(KDS_HashMapList));
     if (map->data == NULL)  ExitF("NULL Calloc", -1);
 
-    map->hash_cell = &kds_hm_get_cell_hash;
-    map->hash_list = &kds_hm_get_list_hash;
     map->size = size;
 
     return 0;
@@ -118,8 +109,8 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string) {
     if (kds_hm_verifier(map) != 0)  ExitF("Incorrect Hash Map", -1);
 #endif /* VERIFIER */
 
-    KDS_Hash hash_cell = map->hash_cell(string);
-    KDS_Hash hash_list = map->hash_list(string);
+    KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
+    KDS_Hash hash_list = kds_hm_get_list_hash(string);
 
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
     int error = -1;
@@ -183,8 +174,8 @@ KDS_HashMapList *KDS_HM_FindString(KDS_HashMap *map, const char *string) {
     if (kds_hm_verifier(map) != 0)  ExitF("Incorrect Hash Map", NULL);
 #endif /* VERIFIER */
 
-    KDS_Hash hash_cell = map->hash_cell(string);
-    KDS_Hash hash_list = map->hash_list(string);
+    KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
+    KDS_Hash hash_list = kds_hm_get_list_hash(string);
 
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
     KDS_HashMapList *value = NULL;
@@ -273,21 +264,19 @@ static int kds_hm_verifier(KDS_HashMap *map) {
  * @param hash_cell Pointer to function 'get_hash_cell'
  * @return int Value with bits from KDS_HashMapErrorFlag
  */
-static int kds_hm_verifier_list(KDS_HashMapList *list, KDS_Hash (*hash_list)(const char *),
-            KDS_Hash (*hash_cell)(const char *), int size) {
+static int kds_hm_verifier_list(KDS_HashMapList *list, int size) {
     assert(list);
-    assert(hash_list);
     assert(size);
 
     int error = KDS_HM_ERROR_NOT;
     if (list->string == NULL) {
         return error;
     }
-    KDS_Hash needed_hash_cell = hash_cell(list->string);
+    KDS_Hash needed_hash_cell = kds_hm_get_cell_hash(list->string);
 
     while (true) {
-        KDS_Hash hash_l = hash_list(list->string);
-        KDS_Hash hash_c = hash_cell(list->string);
+        KDS_Hash hash_l = kds_hm_get_list_hash(list->string);
+        KDS_Hash hash_c = kds_hm_get_cell_hash(list->string);
 
         if (hash_l != list->hash_list) {
             error |= KDS_HM_ERROR_BAD_HASH_LIST;

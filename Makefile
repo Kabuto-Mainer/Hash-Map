@@ -18,6 +18,12 @@ build_3:
 build_0:
 	g++ main.cpp func.cpp text_func.cpp common.cpp $(speed_flags) -o mon
 
+test:
+	g++ $(I) $(speed_flags) -O3 -g -S -masm=intel -o test
+
 
 run:
 	taskset -c 14,15 ./mon
+
+run_test:
+	./test

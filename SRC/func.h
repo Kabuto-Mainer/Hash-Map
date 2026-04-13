@@ -6,6 +6,8 @@
 // ====================================================================
 // USED MACROS
 // ====================================================================
+#define NOT_INLINE __attribute__((noinline))
+
 
 // --------------------------------------------------------------------
 /**
@@ -15,6 +17,8 @@
 #define ExitF(__text__, __ret_val__) \
 do {printf("ERROR in %s:%d||%s\n", __FILE__,__LINE__,__text__); \
     return __ret_val__; } while (0)
+
+
 
 // --------------------------------------------------------------------
 /**
@@ -64,10 +68,10 @@ int KDS_TC_Destroy(KDS_TextContext *cont);
 int KDS_TC_SetWord(KDS_TextContext *cont, int pose);
 char *KDS_TC_GetNextWord(KDS_TextContext *cont);
 
-// ====================================================================
-// HASH FUNCTIONS DECLARATION
-KDS_Hash kds_hm_get_cell_hash(const char *string);
-KDS_Hash kds_hm_get_list_hash(const char *string);
+// // ====================================================================
+// // HASH FUNCTIONS DECLARATION
+// KDS_Hash kds_hm_get_cell_hash(const char *string);
+// KDS_Hash kds_hm_get_list_hash(const char *string);
 
 
 

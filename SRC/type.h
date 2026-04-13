@@ -29,9 +29,6 @@ struct KDS_HashMap {
     int size;   /* Size of map */
 
     KDS_HashMapList *data;  /* Data hash map */
-
-    KDS_Hash (*hash_cell)(const char *);  /* Hash function for get cell */
-    KDS_Hash (*hash_list)(const char *);  /* Hash function for compare strings in list */
 };
 
 struct KDS_TextContext {

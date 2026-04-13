@@ -7,6 +7,7 @@
 #include "func.h"
 #include "type.h"
 #include "common.h"
+#include "hash_func.h"
 
 // ====================================================================
 //  HELPER FUNCTIONS DECLARATION
@@ -47,7 +48,7 @@ int KDS_HM_DumpText(KDS_HashMap *map, const char *file) {
             } else {
                 fprintf(stream, "[\"%s\"{" KDS_COUNT_PRINT_SPEC
                     "}, C:" KDS_HASH_PRINT_SPEC ", L:" KDS_HASH_PRINT_SPEC "]",
-                    list->string, list->counter, map->hash_cell(list->string), list->hash_list);
+                    list->string, list->counter, kds_hm_get_cell_hash(list->string), list->hash_list);
             }
 
             if (list->next != NULL) {
