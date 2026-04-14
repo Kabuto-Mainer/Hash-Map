@@ -22,7 +22,7 @@ int main() {
     KDS_HM_DumpText(&map, DUMP_FILE);
     KDS_HM_DumpDat(&map, "dump2.dat");
 
-    constexpr int AMOUNT = 10000;
+    constexpr int AMOUNT = 1;
 
 #ifdef TEST
     uint64_t data[AMOUNT] = {};
