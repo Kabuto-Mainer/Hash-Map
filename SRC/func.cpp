@@ -95,6 +95,8 @@ KDS_Hash own_cell_hash(const char *string) {
 KDS_Hash own_list_hash(const char *string) {
     assert(string);
 
+// /*
+// это самая быстрая хеi-функция
     KDS_Hash hash = 0x082EFA98EC4E6C89ul;
     int idx = 0;
 
@@ -102,39 +104,58 @@ KDS_Hash own_list_hash(const char *string) {
         hash *= 33;
         hash += (KDS_Hash) string[idx++];
     }
+// */
 
+/*
+    alignas(32) uint8_t buf[32] = {};
 
+    int n = 0;
+    while (n < 32 && string[n] != '\0') {
+        buf[n] = (uint8_t)string[n];
+        n++;
+    }
 
-//     /* Load Value */
-//     __m256i str_v = _mm256_loadu_si256((const __m256i*)string);
-//
-//     /* Get Mask */
-//     __m256i mask_v = _mm256_set1_epi8(0);
-//     mask_v = _mm256_cmpeq_epi8(str_v, mask_v);
-//     int mask_c = _mm256_movemask_epi8(mask_v);
-//
-//     /* Hash Value */
-//     __m256i mixer_1 = _mm256_set1_epi64x(0x082EFA98EC4E6C89ll);
-//     __m256i mixer_2 = _mm256_set1_epi64x((int64_t) 0xC2B2AE3D27D4EB4Fll);
-//
-//     str_v = _mm256_xor_si256(str_v, mixer_1);
-//     str_v = _mm256_add_epi8(str_v, mixer_2);
-//     str_v = _mm256_xor_si256(str_v, mixer_1);
-//
-//     alignas(32) uint8_t bytes[32] = {};
-//     _mm256_store_si256((__m256i*)bytes, str_v);
-//
-//     KDS_Hash hash = 0xA4093822299F31D0ul;
-//     constexpr KDS_Hash len = (sizeof(KDS_Hash) * 8) - 7;
-//
-//     int i = 0;
-//     while (i < 32 && (mask_c & 1) == 0) {
-//         hash ^= (uint64_t)bytes[i++];
-//         hash = (hash >> 7) | (hash << len);
-//         mask_c >>= 1;
-//     }
+    __m256i str_v = _mm256_load_si256((const __m256i*)buf);
+
+    __m256i mixer_1 = _mm256_set1_epi64x(0x082EFA98EC4E6C89ul);
+    __m256i mixer_2 = _mm256_set1_epi64x(0x02B2AE3D27D4EB4Ful);
+
+    str_v = _mm256_xor_si256(str_v, mixer_1);
+    str_v = _mm256_add_epi8(str_v, mixer_2);
+
+    str_v = _mm256_shuffle_epi32(mixer_2, _MM_SHUFFLE(2, 3, 0, 1));
+    int mask_1 = _mm256_movemask_epi8(str_v);
+
+    str_v = _mm256_mul_epu32(str_v, mixer_1);
+    str_v = _mm256_xor_si256(str_v, mixer_2);
+
+    int mask_2 = _mm256_movemask_epi8(str_v);
+
+    constexpr int ROT = 32;
+    constexpr int BITS = sizeof(KDS_Hash) * 8;
+
+    KDS_Hash hash = (KDS_Hash) 0xA4093822299F31D0ULL ^ (KDS_Hash) mask_1;
+    hash = (hash >> ROT) | (hash << (BITS - ROT));
+    hash ^= hash ^ (KDS_Hash) mask_2;
+    hash *= 0xc4ceb9fe1a85ec53ul;
+*/
 
     return hash;
+
+//
+//     KDS_Hash hash = 0xA4093822299F31D0ul;
+//     constexpr KDS_Hash len_7 = (sizeof(KDS_Hash) * 8) - 7;
+//
+//     for (int i = 0; string[i] != '\0'; i++) {
+//         char sym = string[i];
+//         sym ^= 0xEF;
+//         sym += 0xB2;
+//         sym ^= 0xAF;
+//         hash ^= (uint64_t) sym;
+//         hash = (hash >> 7) | (hash << len_7);
+//     }
+//
+//     return hash;
 }
 
 
