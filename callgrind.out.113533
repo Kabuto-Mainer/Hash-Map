@@ -1,0 +1,149 @@
+# callgrind format
+version: 1
+creator: callgrind-3.25.1
+pid: 113533
+cmd:  ./mon
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 156911641
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(1) /home/kabuto/Programming/HashMap/mon
+fl=(4) /home/kabuto/Programming/HashMap/SRC//SRC/CmpString.asm
+fn=(12) 0x00000000000020f0
+144 5434120
++1 5434120
++1 5434120
++2 5434120
++1 5434120
++2 5434120
++1 5434120
++1 5434120
++1 5434120
++2 5434120
++1 5434120
++2 5434120
++1 5434120
++2 5434120
++1 5434120
+
+fl=(2) /home/kabuto/Programming/HashMap/SRC/text_func.cpp
+fn=(4) KDS_TC_GetNextWord(KDS_TextContext*)
+195 5434150
++3 5434150
+-3 10868300
++1 21736600
++3 10868300
+
+fn=(2) KDS_TC_SetWord(KDS_TextContext*, int)
+123 20
++2 10
++1 10
++1 10
+
+fl=(1) /home/kabuto/Programming/HashMap/SRC/main.cpp
+fn=(0) main
+31 3
+-16 2
++19 3
+cfi=(2)
+cfn=(2)
+calls=1 +89 
+* 5
+* 27
+cfi=(2)
+cfn=(2)
+calls=9 +89 
+* 45
++5 50
++1 10
+-1 10
++1 10
+cfi=(2)
+cfn=(4)
+calls=10 195 
+* 100
+* 5434140
+-1 5434140
++1 5434140
+cfi=(2)
+cfn=(4)
+calls=5434140 195 
+* 54341400
++1 16302450
+cfi=(3) /home/kabuto/Programming/HashMap/SRC/func.cpp
+cfn=(6) KDS_HM_FindString32(KDS_HashMap*, char const*)
+calls=5434150 282 
+* 744294530
+* 5434150
+-2 10868300
+-6 20
+
+fl=(3)
+fn=(8) own_cell_hash(char const*)
+88 16302450
+-4 16302450
++5 16302450
+-1 5434150
++12 5434150
+-12 16302450
++1 49856460
+-1 16618820
++12 16618820
+-12 55290610
+
+fn=(6)
+282 10868300
++8 5434150
+-8 21736600
++8 5434150
+cfn=(8)
+calls=5434150 88 
+* 214462810
++5 32604900
++2 10868300
++4 5434150
+-10 16302450
+cfn=(10) own_list_hash(char const*)
+calls=5434150 114 
+* 214462810
+* 5434150
++9 5434150
++1 21736600
+-1 2061400
++1 8245600
++4 6184290
+-8 30
++16 38039050
+-12 21736480
+cfi=(4)
+cfn=(12)
+calls=5434120 144 
+* 81511800
+* 16302360
+
+fn=(10)
+114 16302450
+-3 16302450
++4 5434150
+-1 5434150
++1 10868300
++1 5434150
+-2 16302450
++1 16618820
+-1 16618820
++1 33237640
++1 16618820
+-2 55290610
+
+totals: 847543535

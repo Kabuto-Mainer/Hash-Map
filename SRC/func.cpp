@@ -83,20 +83,20 @@ KDS_Hash own_cell_hash(const char *string) {
 
     KDS_Hash hash = 0x02B2AE3D27D4EB4Fll;
     uint64_t idx = 0;
-    KDS_Hash tmp = 0;
+    // KDS_Hash tmp = 0;
 
     while (string[idx] != '\0') {
-        asm volatile(
-            ".intel_syntax noprefix\n\t"
-            "mov %[t], %[h]\n\t"
-            "shl %[h], 7\n\t"
-            "add %[h], %[t]\n\t"
-            ".att_syntax prefix\n\t"
-            : [h] "+r"(hash), [t] "=&r"(tmp)
-            :
-            : "cc"
-        );
-        // hash *= 129;
+        // asm volatile(
+        //     ".intel_syntax noprefix\n\t"
+        //     "mov %[t], %[h]\n\t"
+        //     "shl %[h], 7\n\t"
+        //     "add %[h], %[t]\n\t"
+        //     ".att_syntax prefix\n\t"
+        //     : [h] "+r"(hash), [t] "=&r"(tmp)
+        //     :
+        //     : "cc"
+        // );
+        hash *= 129;
         hash += (KDS_Hash) string[idx++];
     }
 
