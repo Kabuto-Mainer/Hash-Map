@@ -82,10 +82,21 @@ KDS_Hash own_cell_hash(const char *string) {
     assert(string);
 
     KDS_Hash hash = 0x02B2AE3D27D4EB4Fll;
-    int idx = 0;
+    uint64_t idx = 0;
+    KDS_Hash tmp = 0;
 
     while (string[idx] != '\0') {
-        hash *= 129;
+        asm volatile(
+            ".intel_syntax noprefix\n\t"
+            "mov %[t], %[h]\n\t"
+            "shl %[h], 7\n\t"
+            "add %[h], %[t]\n\t"
+            ".att_syntax prefix\n\t"
+            : [h] "+r"(hash), [t] "=&r"(tmp)
+            :
+            : "cc"
+        );
+        // hash *= 129;
         hash += (KDS_Hash) string[idx++];
     }
 
@@ -123,7 +134,7 @@ KDS_Hash own_list_hash(const char *string) {
     str_v = _mm256_xor_si256(str_v, mixer_1);
     str_v = _mm256_add_epi8(str_v, mixer_2);
 
-    str_v = _mm256_shuffle_epi32(mixer_2, _MM_SHUFFLE(2, 3, 0, 1));
+    str_v = _mm256_shuffle_epi32(str_v, _MM_SHUFFLE(2, 3, 0, 1));
     int mask_1 = _mm256_movemask_epi8(str_v);
 
     str_v = _mm256_mul_epu32(str_v, mixer_1);
@@ -278,7 +289,7 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
 
     KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
     KDS_Hash hash_list = kds_hm_get_list_hash(string);
-    uint8_t len = hl_get_len(hash_list);
+    // uint8_t len = hl_get_len(hash_list);
     hash_list = hl_get_hash(hash_list);
 
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
@@ -286,6 +297,7 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
     if (list->string == NULL)   return value;
 
     while (true) {
+        uint8_t len = hl_get_len(list->hash_list);
         if (hl_get_hash(list->hash_list) == hash_list && KDS_HM_CmpString(list->string, string, len) == 0) {
             value = list;
             break;
