@@ -82,23 +82,135 @@ KDS_Hash own_cell_hash(const char *string) {
     assert(string);
 
     KDS_Hash hash = 0x02B2AE3D27D4EB4Fll;
-    uint64_t idx = 0;
-    // KDS_Hash tmp = 0;
+//
+//     int idx = 0;
+//     while (string[idx] != '\0') {
+//         hash *= 129;
+//         hash += (KDS_Hash) string[idx++];
+//     }
+//     uint64_t idx = 0;
+//     // KDS_Hash tmp = 0;
+//
+//     while (string[idx] != '\0') {
+//         hash *= 129;
+//         // asm volatile(
+//         //     ".intel_syntax noprefix\n\t"
+//         //     "mov %[t], %[h]\n\t"
+//         //     "shl %[h], 7\n\t"
+//         //     "add %[h], %[t]\n\t"
+//         //     ".att_syntax prefix\n\t"
+//         //     : [h] "+r"(hash), [t] "=&r"(tmp)
+//         //     :
+//         //     : "cc"
+//         // );
+//
+//
+//         hash += (KDS_Hash) string[idx++];
+//         // asm volatile(
+//         //     ".intel_syntax noprefix\n\t"
+//         //     "movzx %[t], word ptr [%[str] + %[idx]]\n\t"
+//         //     "add %[h], %[t]\n\t"
+//         //     ".att_syntax prefix\n\t"
+//         //     : [h]"+r"(hash), [t]"=&r"(tmp)
+//         //     : [str]"r"(string), [idx]"r"(idx)
+//         //     : "cc"
+//         // );
+//         // idx += 2;
+//     }
 
+
+    if (string[0] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[0];
+
+    if (string[1] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[1];
+
+    if (string[2] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[2];
+
+    if (string[3] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[3];
+
+    if (string[4] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[4];
+
+    if (string[5] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[5];
+
+    if (string[6] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[6];
+
+    if (string[7] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[7];
+
+    if (string[8] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[8];
+
+    if (string[9] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[9];
+
+    if (string[10] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[10];
+
+    if (string[11] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[11];
+
+    if (string[12] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[12];
+
+    if (string[13] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[13];
+
+    if (string[14] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[14];
+
+    if (string[15] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[15];
+
+    if (string[15] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[15];
+
+    if (string[16] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[16];
+
+    if (string[17] == '\0')  return hash;
+    hash *= 129;
+    hash += (KDS_Hash) string[17];
+
+
+    int idx = 18;
     while (string[idx] != '\0') {
-        // asm volatile(
-        //     ".intel_syntax noprefix\n\t"
-        //     "mov %[t], %[h]\n\t"
-        //     "shl %[h], 7\n\t"
-        //     "add %[h], %[t]\n\t"
-        //     ".att_syntax prefix\n\t"
-        //     : [h] "+r"(hash), [t] "=&r"(tmp)
-        //     :
-        //     : "cc"
-        // );
         hash *= 129;
         hash += (KDS_Hash) string[idx++];
     }
+
+
+    // while (string[idx] != '\0') {
+    //     hash *= 33;
+    //     hash += (KDS_Hash) string[idx++];
+    //     // hash ^= hash >> 33;
+    //     // hash *= (KDS_Hash) string[idx];
+    //     // hash ^= hash << 37;
+    //     // hash ^= (KDS_Hash) string[idx++];
+    // }
 
     return hash;
 }
@@ -114,6 +226,10 @@ KDS_Hash own_list_hash(const char *string) {
     while (string[idx] != '\0') {
         hash *= 33;
         hash += (KDS_Hash) string[idx++];
+        // hash ^= hash >> 33;
+        // hash *= (KDS_Hash) string[idx];
+        // hash ^= hash << 37;
+        // hash ^= (KDS_Hash) string[idx++];
     }
 // */
 
@@ -288,17 +404,26 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
 #endif /* VERIFIER */
 
     KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
-    KDS_Hash hash_list = kds_hm_get_list_hash(string);
+    // KDS_Hash hash_list = kds_hm_get_list_hash(string);
     // uint8_t len = hl_get_len(hash_list);
-    hash_list = hl_get_hash(hash_list);
+    // hash_list = hl_get_hash(hash_list);
 
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
     KDS_HashMapList *value = NULL;
     if (list->string == NULL)   return value;
 
+    uint8_t len = hl_get_len(list->hash_list);
+    if (KDS_HM_CmpString(list->string, string, len) == 0) {
+        return list;
+    }
+    if (list->next == NULL) {
+        return list;
+    }
+    list = list->next;
+
     while (true) {
         uint8_t len = hl_get_len(list->hash_list);
-        if (hl_get_hash(list->hash_list) == hash_list && KDS_HM_CmpString(list->string, string, len) == 0) {
+        if (/*hl_get_hash(list->hash_list) == hash_list && */KDS_HM_CmpString(list->string, string, len)/*strcmp(list->string, string)*/ == 0) {
             value = list;
             break;
         }

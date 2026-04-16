@@ -1,0 +1,166 @@
+# callgrind format
+version: 1
+creator: callgrind-3.25.1
+pid: 289501
+cmd:  ./mon
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 10225190
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(1) /home/kabuto/Programming/HashMap/mon
+fl=(4) /home/kabuto/Programming/HashMap/SRC//SRC/CmpString.asm
+fn=(8) 0x00000000000026b0
+144 602262
++1 602262
++1 602262
++2 602262
++1 602262
++2 602262
++1 602262
++1 602262
++1 602262
++2 602262
++1 602262
++2 602262
++1 602262
++2 543412
++1 543412
++3 58850
++1 58850
++1 58850
+
+fl=(1) /home/kabuto/Programming/HashMap/SRC/main.cpp
+fn=(0) main
+34 2
+-3 2
++3 1
+cfi=(2) /home/kabuto/Programming/HashMap/SRC/text_func.cpp
+cfn=(2) KDS_TC_SetWord(KDS_TextContext*, int)
+calls=1 +89 
+* 5
++5 4
++1 1
+-1 1
++1 1
+cfi=(2)
+cfn=(4) KDS_TC_GetNextWord(KDS_TextContext*)
+calls=1 195 
+* 8
+* 543414
+-1 543414
++1 543414
+cfi=(2)
+cfn=(4)
+calls=543414 195 
+* 4347312
++1 1630245
+cfi=(3) /home/kabuto/Programming/HashMap/SRC/func.cpp
+cfn=(6) KDS_HM_FindString32(KDS_HashMap*, char const*)
+calls=543415 398 
+* 42081810
+* 543415
+-2 1086830
+
+fl=(3)
+fn=(6)
+398 1630245
+122 1630245
++2 1086830
++2 1630245
++1 1562295
++1 520765
++2 1562295
++1 1284735
++1 428245
++2 1284735
++1 878853
++1 292951
++2 878853
++1 530487
++1 176829
++2 530487
++1 327045
++1 109015
++2 327045
++1 198468
++1 66156
++2 198468
++1 102099
++1 34033
++2 102099
++1 53463
++1 17821
++2 53463
++1 25566
++1 8522
++2 25566
++1 11826
++1 3942
++2 11826
++1 5772
++1 1924
++2 5772
++1 2553
++1 851
++2 2553
++1 1038
++1 346
++2 1038
++1 519
++1 173
++2 519
++1 84
++1 84
++3 84
++1 84
++2 252
++1 47
++1 47
++2 141
++1 36
++1 72
++4 712
++1 142
++1 284
+411 5977565
++2 2173659
++4 2717070
+cfi=(4)
+cfn=(8)
+calls=543414 144 
+* 8200051
+* 294240
+cfi=(4)
+cfn=(8)
+calls=58848 144 
+* 892729
+* 1204524
++12 2717075
+-8 176550
+-4 117696
+-4 6
+
+fl=(2)
+fn=(2)
+123 2
++2 1
++1 1
++1 1
+
+fn=(4)
+195 1630245
++1 1630245
++3 1086830
+
+totals: 51319879

@@ -1,0 +1,175 @@
+# callgrind format
+version: 1
+creator: callgrind-3.25.1
+pid: 211899
+cmd:  ./mon
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 15691170
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(1) /home/kabuto/Programming/HashMap/mon
+fl=(2) /home/kabuto/Programming/HashMap/SRC/text_func.cpp
+fn=(2) KDS_TC_SetWord(KDS_TextContext*, int)
+123 2
++2 1
++1 1
++1 1
+
+fn=(4) KDS_TC_GetNextWord(KDS_TextContext*)
+195 1630245
++1 1630245
++3 1086830
+
+fl=(1) /home/kabuto/Programming/HashMap/SRC/main.cpp
+fn=(0) main
+34 2
+-3 2
++3 1
+cfi=(2)
+cfn=(2)
+calls=1 +89 
+* 5
++5 4
++1 1
+-1 1
++1 1
+cfi=(2)
+cfn=(4)
+calls=1 195 
+* 8
+* 543414
+-1 543414
++1 543414
+cfi=(2)
+cfn=(4)
+calls=543414 195 
+* 4347312
++1 1630245
+cfi=(3) /home/kabuto/Programming/HashMap/SRC/func.cpp
+cfn=(6) KDS_HM_FindString32(KDS_HashMap*, char const*)
+calls=543415 286 
+* 65971427
+* 543415
+-2 1086830
+
+fl=(3)
+fn=(8) own_cell_hash(char const*)
+88 1630245
++12 1086830
+-12 1630245
++11 1562295
++1 520765
+-12 1562295
++11 1284735
++1 428245
+-12 1284735
++11 878853
+-11 292951
++12 292951
+-12 1116389
++11 176829
+-11 176829
++11 353658
++1 176829
+-12 530487
++11 243092
+-11 243092
++11 486184
++1 243092
+-12 906105
++16 366586
+
+fn=(10) own_list_hash(char const*)
+114 1630245
++2 1086830
+-2 1630245
++1 1562295
++1 520765
+-2 1562295
++1 1284735
++1 428245
+-2 1284735
++1 878853
+-1 292951
++2 292951
+-2 939560
++1 176829
+-1 176829
++1 353658
++1 176829
+-2 530487
++1 243092
+-1 243092
++1 486184
++1 243092
+-2 906105
++60 366586
+
+fn=(6)
+286 1086830
++8 543415
+-8 1630245
++8 543415
+cfn=(8)
+calls=543415 88 
+* 17474317
++5 1086830
+-5 543415
++5 1086830
+-4 1086830
+cfn=(10)
+calls=543415 114 
+* 17297488
++9 543415
++1 543415
+-10 543415
++10 3850172
+cfi=(4) /home/kabuto/Programming/HashMap/SRC//SRC/CmpString.asm
+cfn=(12) 0x00000000000020f0
+calls=419128 144 
+* 6286920
+* 838256
++12 2717075
+-8 618429
+-4 206140
+-1 206140
++1 1321696
+cfi=(4)
+cfn=(12)
+calls=124284 144 
+* 1864260
+* 248568
+-6 2173660
++2 1630245
++16 6
+
+fl=(4)
+fn=(12)
+144 543412
++1 543412
++1 543412
++2 543412
++1 543412
++2 543412
++1 543412
++1 543412
++1 543412
++2 543412
++1 543412
++2 543412
++1 543412
++2 543412
++1 543412
+
+totals: 75209496

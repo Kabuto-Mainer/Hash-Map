@@ -1,5 +1,5 @@
 set terminal pngcairo size 1400,800
-set output 'bars.png'
+set output 'hash_view.png'
 
 set title "Столбчатая диаграмма"
 set xlabel "Индекс"

@@ -140,7 +140,6 @@ KDS_HM_CmpString:
     ; rsi - (input) out string
     ; dl  - (input) len string from hash
 
-.circle:
     xor eax, eax
     cmp dl, 31
     ja .not_equal
