@@ -19,6 +19,9 @@ asm_files = SRC/CmpString.asm
 debug:
 	g++ SRC/main.cpp SRC/func.cpp SRC/text_func.cpp SRC/common.cpp SRC/asmo.o $(speed_flags) $(I) -O3 -g  -o mon
 
+debug_cl:
+	clang SRC/main.cpp SRC/func.cpp SRC/text_func.cpp SRC/common.cpp SRC/asmo.o $(clang_flags) $(I) -O3 -g  -o mon
+
 prof_gen:
 	g++ SRC/main.cpp SRC/func.cpp SRC/text_func.cpp SRC/common.cpp SRC/asmo.o $(speed_flags) $(I)  -fprofile-generate -O3 -g  -o mon
 

@@ -18,8 +18,8 @@ enum KDS_HashMapErrorFlag {
 };
 
 struct KDS_HashMapList {
-    KDS_Hash hash_list;
     char *string;
+    KDS_Hash hash_list;
 
     KDS_Count counter;
     KDS_HashMapList *next;

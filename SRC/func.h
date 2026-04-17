@@ -52,7 +52,11 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string);
  * @return KDS_HashMapList* NULL on error
  * @note Len of Finding String must be less 32 byte
  */
+#ifdef NINLINE
+NOT_INLINE KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string);
+#else
 KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string);
+#endif /* NINLINE */
 
 // --------------------------------------------------------------------
 /**

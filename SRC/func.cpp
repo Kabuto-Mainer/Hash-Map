@@ -88,6 +88,8 @@ KDS_Hash own_cell_hash(const char *string) {
 //         hash *= 129;
 //         hash += (KDS_Hash) string[idx++];
 //     }
+
+//
 //     uint64_t idx = 0;
 //     // KDS_Hash tmp = 0;
 //
@@ -103,7 +105,7 @@ KDS_Hash own_cell_hash(const char *string) {
 //         //     :
 //         //     : "cc"
 //         // );
-//
+//    }
 //
 //         hash += (KDS_Hash) string[idx++];
 //         // asm volatile(
@@ -395,7 +397,13 @@ int KDS_HM_AddString(KDS_HashMap *map, const char *string) {
  * @return KDS_HashMapList* Pointer to List with needed String on success
  * @return KDS_HashMapList* NULL on error
  */
+
+ #ifdef NINLINE
+NOT_INLINE KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
+#else
 KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
+#endif /* NINLINE */
+
     assert(map);
     assert(string);
 
@@ -403,7 +411,9 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
     if (kds_hm_verifier(map) != 0)  ExitF("Incorrect Hash Map", NULL);
 #endif /* VERIFIER */
 
+    // KDS_Hash hash_cell = map->hash_list(string);
     KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
+
     // KDS_Hash hash_list = kds_hm_get_list_hash(string);
     // uint8_t len = hl_get_len(hash_list);
     // hash_list = hl_get_hash(hash_list);
