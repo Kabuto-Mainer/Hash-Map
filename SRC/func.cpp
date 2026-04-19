@@ -8,6 +8,8 @@
 #include "func.h"
 #include "hash_func.h"
 
+
+
 /*
     Немного об устройстве хеш-таблицы
 
@@ -74,7 +76,6 @@ static int kds_hm_verifier_list(KDS_HashMapList *list, int size);
 #endif /* VERIFIER */
 
 
-// constexpr unsigned char POLINOM =  0x1D;
 
 // ====================================================================
 // HASH FUNCTIONS
@@ -85,18 +86,20 @@ KDS_Hash own_cell_hash(const char *string) {
 
     for (int i = 0; string[i] != '\0'; i++) {
 
-        /* Intrinsic crc */
-        hash = _mm_crc32_u64(hash, (KDS_Hash) string[i]);
+#ifndef USE_OWN_CRC
+        hash = _mm_crc32_u64(hash, (long long unsigned int) string[i]);
+#else
+        hash ^= (unsigned char)string[i];
 
-        /* Own crc */
-        // hash ^= (unsigned char)string[i];
+        for (int j = 0; j < 8; j++) {
+            if (hash & 1)
+                hash = (hash >> 1) ^ 0x82F63B78u;
+            else
+                hash >>= 1;
+        }
+#endif /* USE_OWN_CRC */
 
-        // for (int j = 0; j < 8; j++) {
-        //     if (hash & 1)
-        //         hash = (hash >> 1) ^ 0xEDB88320u;
-        //     else
-        //         hash >>= 1;
-        // }
+
     }
     hash = ~hash;
 
@@ -246,20 +249,35 @@ KDS_Hash own_list_hash(const char *string) {
 
     //Это работающие версии, но на данный момент эта функция не используется при поиске
 
-// /*
-// это самая быстрая хеi-функция
-    KDS_Hash hash = 0x082EFA98EC4E6C89ul;
-    int idx = 0;
 
-    while (string[idx] != '\0') {
-        hash *= 33;
-        hash += (KDS_Hash) string[idx++];
-        // hash ^= hash >> 33;
-        // hash *= (KDS_Hash) string[idx];
-        // hash ^= hash << 37;
-        // hash ^= (KDS_Hash) string[idx++];
+    KDS_Hash hash = 0xFFFFFFFF;
+
+    for (int i = 0; string[i] != '\0'; i++) {
+
+#ifndef USE_OWN_CRC_LIST
+        asm volatile(
+            ".intel_syntax noprefix\n\t"
+            "crc32 %[dst], %[src]\n\t"
+            ".att_syntax prefix\n\t"
+            : [dst] "+r"(hash)
+            : [src] "r"(string[i])
+            : "cc"
+        );
+
+        // hash = _mm_crc32_u64(hash, (long long unsigned int) string[i]);
+#else
+        hash ^= (unsigned char)string[i];
+
+        for (int j = 0; j < 8; j++) {
+            if (hash & 1)
+                hash = (hash >> 1) ^ 0x82F63B78u;
+            else
+                hash >>= 1;
+        }
+#endif /* USE_OWN_CRC_LIST */
+
     }
-// */
+    hash = ~hash;
 
 /*
     alignas(32) uint8_t buf[32] = {};
@@ -430,6 +448,7 @@ NOT_INLINE KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *st
 KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
 #endif /* NINLINE */
 
+
     assert(map);
     assert(string);
 
@@ -440,29 +459,30 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
     // KDS_Hash hash_cell = map->hash_list(string);
     KDS_Hash hash_cell = kds_hm_get_cell_hash(string);
 
-    // KDS_Hash hash_list = kds_hm_get_list_hash(string);
-    // uint8_t len = hl_get_len(hash_list);
-    // hash_list = hl_get_hash(hash_list);
+#ifdef USE_HASH_LIST
+    KDS_Hash hash_list = kds_hm_get_list_hash(string);
+    hash_list = hl_get_hash(hash_list);
+#endif /* USE_HASH_LIST */
 
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
     KDS_HashMapList *value = NULL;
     if (list->string == NULL)   return value;
 
-    uint8_t len = hl_get_len(list->hash_list);
-    if (KDS_HM_CmpString(list->string, string, len) == 0) {
-        return list;
-    }
-    if (list->next == NULL) {
-        return list;
-    }
-    list = list->next;
-
     while (true) {
         uint8_t len = hl_get_len(list->hash_list);
-        if (/*hl_get_hash(list->hash_list) == hash_list && */KDS_HM_CmpString(list->string, string, len)/*strcmp(list->string, string)*/ == 0) {
+
+#ifdef USE_HASH_LIST
+        if (hl_get_hash(list->hash_list) == hash_list && KDS_HM_CmpString(list->string, string, len) == 0) {
             value = list;
             break;
         }
+#else
+    if (KDS_HM_CmpString(list->string, string, len)/*strcmp(list->string, string)*/ == 0) {
+        value = list;
+        break;
+    }
+#endif /* USE_HASH_LIST */
+
         if (list->next != NULL) {
             list = list->next;
             continue;

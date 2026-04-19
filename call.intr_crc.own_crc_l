@@ -1,0 +1,183 @@
+# callgrind format
+version: 1
+creator: callgrind-3.25.1
+pid: 62896
+cmd:  ./mon
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 15397267
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(1) /home/kabuto/Programming/HashMap/mon
+fl=(2) /home/kabuto/Programming/HashMap/SRC/text_func.cpp
+fn=(2) KDS_TC_SetWord(KDS_TextContext*, int)
+123 2
++2 1
++1 1
++1 1
+
+fn=(6) KDS_TC_GetNextWord(KDS_TextContext*)
+195 543415
++3 543415
+-3 1086830
++1 2173660
++3 1086830
+
+fl=(1) /home/kabuto/Programming/HashMap/SRC/main.cpp
+fn=(0) main
+34 2
+-3 2
++3 1
+cfi=(2)
+cfn=(2)
+calls=1 +89 
+* 5
+fi=(3) /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/ia32intrin.h
++80 2
+fe=(1)
+-75 1
+fi=(3)
++75 2
+fe=(1)
+-75 5
++1 1
+-1 1
++1 1
+cfi=(2)
+cfn=(6)
+calls=1 195 
+* 10
+* 543414
+-1 543414
++1 543414
+cfi=(2)
+cfn=(6)
+calls=543414 195 
+* 5434140
++1 1630245
+cfi=(4) /home/kabuto/Programming/HashMap/SRC/func.cpp
+cfn=(8) KDS_HM_FindString32(KDS_HashMap*, char const*)
+calls=543415 446 
+* 155358105
+* 543415
+-2 1086830
+
+fl=(4)
+fn=(10) own_cell_hash(char const*)
+87 2173660
+-2 2173660
++2 543415
+fi=(6) /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/smmintrin.h
+843 543415
+fe=(4)
+87 3292127
+fi=(6)
+843 1661882
+fe=(4)
+87 4985646
++17 1086830
+
+fn=(8)
+446 1086830
++14 543415
+-14 2717075
++14 543415
+cfn=(10)
+calls=543415 87 
+* 16460635
++7 3260490
++2 1086830
++6 543414
+-12 1086828
+cfn=(12) own_list_hash(char const*)
+calls=543414 255 
+* 108535831
+* 543414
++9 543414
++3 2173656
+-3 59235
++3 236940
++11 177711
+-17 3
++25 3803905
+-19 2173648
+cfi=(5) /home/kabuto/Programming/HashMap/SRC//SRC/CmpString.asm
+cfn=(14) 0x00000000000021a0
+calls=543412 144 
+* 8151180
+* 1630236
+
+fn=(12)
+255 2173656
+-2 1630242
++16 1086828
++3 543414
++3 543414
+-3 3260484
++3 543414
+-3 2173656
++3 543414
+-3 2173656
++3 543414
+-3 2173656
++3 543414
+-3 2173656
++3 543414
+-3 2173656
++3 543414
+-20 1086828
++17 2173656
++3 543414
+-3 1086828
+-17 1086828
++14 3323602
++3 1661801
++3 1661801
+-3 9970806
++3 1661801
+-3 6647204
++3 1661801
+-3 6647204
++3 1661801
+-3 6647204
++3 1661801
+-3 6647204
++3 1661801
+-3 6647204
++3 1661801
+-20 3323602
++17 6647204
++3 1661801
+-3 3323602
+-17 3323602
++25 1086828
+
+fl=(5)
+fn=(14)
+144 543412
++1 543412
++1 543412
++2 543412
++1 543412
++2 543412
++1 543412
++1 543412
++1 543412
++2 543412
++1 543412
++2 543412
++1 543412
++2 543412
++1 543412
+
+totals: 165683010
