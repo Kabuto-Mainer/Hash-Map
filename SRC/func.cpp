@@ -81,15 +81,37 @@ static int kds_hm_verifier_list(KDS_HashMapList *list, int size);
 KDS_Hash own_cell_hash(const char *string) {
     assert(string);
 
-    KDS_Hash hash = 0x02B2AE3D27D4EB4Fll;
-//
+    KDS_Hash hash = 0xFFFFFFFF;
+
+    for (int i = 0; string[i] != '\0'; i++) {
+
+        /* Intrinsic crc */
+        hash = _mm_crc32_u64(hash, (KDS_Hash) string[i]);
+
+        /* Own crc */
+        // hash ^= (unsigned char)string[i];
+
+        // for (int j = 0; j < 8; j++) {
+        //     if (hash & 1)
+        //         hash = (hash >> 1) ^ 0xEDB88320u;
+        //     else
+        //         hash >>= 1;
+        // }
+    }
+    hash = ~hash;
+
+// check tzmsk
+
+    // KDS_Hash hash = 0x02B2AE3D27D4EB4Fll;
+
+//      0. Изначальная функция
 //     int idx = 0;
 //     while (string[idx] != '\0') {
 //         hash *= 129;
 //         hash += (KDS_Hash) string[idx++];
 //     }
 
-//
+//     1. Со встроенным asm
 //     uint64_t idx = 0;
 //     // KDS_Hash tmp = 0;
 //
@@ -120,91 +142,92 @@ KDS_Hash own_cell_hash(const char *string) {
 //         // idx += 2;
 //     }
 
+//     2. Ускоренная с раскрытием цикла
+//     if (string[0] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[0];
+//
+//     if (string[1] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[1];
+//
+//     if (string[2] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[2];
+//
+//     if (string[3] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[3];
+//
+//     if (string[4] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[4];
+//
+//     if (string[5] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[5];
+//
+//     if (string[6] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[6];
+//
+//     if (string[7] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[7];
+//
+//     if (string[8] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[8];
+//
+//     if (string[9] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[9];
+//
+//     if (string[10] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[10];
+//
+//     if (string[11] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[11];
+//
+//     if (string[12] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[12];
+//
+//     if (string[13] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[13];
+//
+//     if (string[14] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[14];
+//
+//     if (string[15] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[15];
+//
+//     if (string[15] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[15];
+//
+//     if (string[16] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[16];
+//
+//     if (string[17] == '\0')  return hash;
+//     hash *= 129;
+//     hash += (KDS_Hash) string[17];
+//
+//
+//     int idx = 18;
+//     while (string[idx] != '\0') {
+//         hash *= 129;
+//         hash += (KDS_Hash) string[idx++];
+//     }
 
-    if (string[0] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[0];
 
-    if (string[1] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[1];
-
-    if (string[2] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[2];
-
-    if (string[3] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[3];
-
-    if (string[4] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[4];
-
-    if (string[5] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[5];
-
-    if (string[6] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[6];
-
-    if (string[7] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[7];
-
-    if (string[8] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[8];
-
-    if (string[9] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[9];
-
-    if (string[10] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[10];
-
-    if (string[11] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[11];
-
-    if (string[12] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[12];
-
-    if (string[13] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[13];
-
-    if (string[14] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[14];
-
-    if (string[15] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[15];
-
-    if (string[15] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[15];
-
-    if (string[16] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[16];
-
-    if (string[17] == '\0')  return hash;
-    hash *= 129;
-    hash += (KDS_Hash) string[17];
-
-
-    int idx = 18;
-    while (string[idx] != '\0') {
-        hash *= 129;
-        hash += (KDS_Hash) string[idx++];
-    }
-
-
+    // 3. Своя функция
     // while (string[idx] != '\0') {
     //     hash *= 33;
     //     hash += (KDS_Hash) string[idx++];
@@ -219,6 +242,9 @@ KDS_Hash own_cell_hash(const char *string) {
 // --------------------------------------------------------------------
 KDS_Hash own_list_hash(const char *string) {
     assert(string);
+
+
+    //Это работающие версии, но на данный момент эта функция не используется при поиске
 
 // /*
 // это самая быстрая хеi-функция
