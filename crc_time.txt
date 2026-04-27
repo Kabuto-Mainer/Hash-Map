@@ -1,3 +1,7 @@
 Own crc + Own crc list:  46.700.000 +- 200.000
 Intr crc + Own crc list:  33.600.000 +- 170.000
 Intr crc + Asm crc list:  18.100.000 +- 150.000
+
+
+No Inline:  14.800.000 +- 100.000
+With Inline: 13.900.000 +- 100.000

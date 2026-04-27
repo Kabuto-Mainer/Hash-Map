@@ -1,0 +1,101 @@
+# callgrind format
+version: 1
+creator: callgrind-3.25.1
+pid: 13555
+cmd:  ./mon
+part: 1
+
+
+desc: I1 cache:
+desc: D1 cache:
+desc: LL cache:
+
+desc: Timerange: Basic block 0 - 10211473
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(1) /home/kabuto/Programming/HashMap/mon
+fl=(1) /home/kabuto/Programming/HashMap/SRC/main.cpp
+fn=(0) main
+31 2
+fi=(2) SRC/text_func.cpp
++92 3
+fe=(1)
+-86 4
+-37 4
+fi=(2)
+196 1630245
+fe=(1)
+41 1630245
+cfi=(3) /home/kabuto/Programming/HashMap/SRC/func.cpp
+cfn=(4) KDS_HM_FindString32(KDS_HashMap*, char const*)
+calls=543415 448
+* 44236030
+-2 1086830
+fi=(2)
+195 1086830
+fe=(1)
+
+fl=(3)
+fn=(4)
+448 3260490
++14 1086830
+cfn=(6) own_cell_hash(char const*)
+calls=543415 89
+* 17579102
++20 4347320
++2 1086832
+0 1086826
+495 543413
++8 1630239
+cfi=(4) /home/kabuto/Programming/HashMap/SRC//SRC/CmpString.asm
+cfn=(8) 0x0000000000001d10
+calls=543413 144
+* 8205646
+-8 66395
++8 199185
+cfi=(4)
+cfn=(8)
+calls=66395 144
+* 1007870
+* 1219616
++6 132792
+0 66399
+524 2717075
+
+fn=(6)
+89 2173660
+-89 1086830
+92 1086830
+-3 2173660
++3 3323764
+-3 6647528
++16 543415
+248 543415
+
+fl=(4)
+fn=(8)
+144 609808
++1 609808
++1 609808
++2 609808
++1 609808
++2 609808
++1 609808
++1 609808
++1 609808
++2 609808
++1 609808
++2 609808
++1 609808
++2 543412
++1 543412
++3 66396
++1 66396
++1 66396
+
+totals: 49670193

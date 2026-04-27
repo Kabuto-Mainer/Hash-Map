@@ -33,6 +33,8 @@
     Для ускорения реализации в условиях отсутствия поддержки AVX_512 максимальная длина поддерживаемой строчки - 31 байт (+ '\0').
 */
 
+/*  Проверить накладные расходы на вызов фукнции на asm */
+
 constexpr int SUPPORTED_SIZE_STRING = 31;
 constexpr KDS_Hash HASH_LIST_LEN_MASK = (KDS_Hash) 0xFF << ((sizeof(KDS_Hash) - 1) * 8);
 constexpr KDS_Hash HASH_LIST_HASH_MASK = ~HASH_LIST_LEN_MASK;
@@ -99,20 +101,23 @@ KDS_Hash own_cell_hash(const char *string) {
         }
 #endif /* USE_OWN_CRC */
 
-
     }
     hash = ~hash;
 
+
+
 // check tzmsk
 
-    // KDS_Hash hash = 0x02B2AE3D27D4EB4Fll;
+    /* Рабочие версии различных хеш-функций */
 
-//      0. Изначальная функция
-//     int idx = 0;
-//     while (string[idx] != '\0') {
-//         hash *= 129;
-//         hash += (KDS_Hash) string[idx++];
-//     }
+//  KDS_Hash hash = 0x02B2AE3D27D4EB4Fll;
+
+    //  0. Изначальная функция
+    // int idx = 0;
+    // while (string[idx] != '\0') {
+    //     hash *= 129;
+    //     hash += (KDS_Hash) string[idx++];
+    // }
 
 //     1. Со встроенным asm
 //     uint64_t idx = 0;
@@ -242,6 +247,8 @@ KDS_Hash own_cell_hash(const char *string) {
 
     return hash;
 }
+
+
 // --------------------------------------------------------------------
 KDS_Hash own_list_hash(const char *string) {
     assert(string);
@@ -255,6 +262,15 @@ KDS_Hash own_list_hash(const char *string) {
     for (int i = 0; string[i] != '\0'; i++) {
 
 #ifndef USE_OWN_CRC_LIST
+
+#ifdef USE_CLANG
+        asm volatile(
+            "crc32b %1, %0"
+            : "+r"(hash)
+            : "rm"(string[i])
+            : "cc"
+        );
+#else
         asm volatile(
             ".intel_syntax noprefix\n\t"
             "crc32 %[dst], %[src]\n\t"
@@ -263,8 +279,8 @@ KDS_Hash own_list_hash(const char *string) {
             : [src] "r"(string[i])
             : "cc"
         );
+#endif /* USE_CLANG */
 
-        // hash = _mm_crc32_u64(hash, (long long unsigned int) string[i]);
 #else
         hash ^= (unsigned char)string[i];
 
@@ -279,6 +295,7 @@ KDS_Hash own_list_hash(const char *string) {
     }
     hash = ~hash;
 
+    /* Это рабочие версии, но в данную реализацию они не попали из-за малой скорости */
 /*
     alignas(32) uint8_t buf[32] = {};
 
@@ -314,21 +331,6 @@ KDS_Hash own_list_hash(const char *string) {
 */
 
     return hash;
-
-//
-//     KDS_Hash hash = 0xA4093822299F31D0ul;
-//     constexpr KDS_Hash len_7 = (sizeof(KDS_Hash) * 8) - 7;
-//
-//     for (int i = 0; string[i] != '\0'; i++) {
-//         char sym = string[i];
-//         sym ^= 0xEF;
-//         sym += 0xB2;
-//         sym ^= 0xAF;
-//         hash ^= (uint64_t) sym;
-//         hash = (hash >> 7) | (hash << len_7);
-//     }
-//
-//     return hash;
 }
 
 
@@ -464,11 +466,32 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
     hash_list = hl_get_hash(hash_list);
 #endif /* USE_HASH_LIST */
 
+//     KDS_Hash mask = (KDS_Hash) map->size - 1;
+//     uint64_t idx;
+//
+//     asm volatile(
+//         "movq %1, %0\n\t"
+//         "andq %2, %0\n\t"
+//         : "=&r"(idx)
+//         : "r"(hash_cell), "r"(mask)
+//         : "cc"
+//     );
+//
+// KDS_HashMapList *list = &(map->data[idx]);
+
     KDS_HashMapList *list = &(map->data[hash_cell % (KDS_Hash) map->size]);
     KDS_HashMapList *value = NULL;
     if (list->string == NULL)   return value;
 
+
     while (true) {
+        // asm volatile(
+        //     "prefetcht0 (%0)"
+        //     :
+        //     : "r"(list->string)
+        //     : "memory"
+        // );
+
         uint8_t len = hl_get_len(list->hash_list);
 
 #ifdef USE_HASH_LIST
@@ -484,6 +507,13 @@ KDS_HashMapList *KDS_HM_FindString32(KDS_HashMap *map, const char *string) {
 #endif /* USE_HASH_LIST */
 
         if (list->next != NULL) {
+            // asm volatile(
+            //     "prefetcht0 (%0)"
+            //     :
+            //     : "r"(list->next)
+            //     : "memory"
+            // );
+
             list = list->next;
             continue;
         }

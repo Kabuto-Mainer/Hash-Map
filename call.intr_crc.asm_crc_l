@@ -6,9 +6,9 @@ cmd:  ./mon
 part: 1
 
 
-desc: I1 cache: 
-desc: D1 cache: 
-desc: LL cache: 
+desc: I1 cache:
+desc: D1 cache:
+desc: LL cache:
 
 desc: Timerange: Basic block 0 - 15397352
 desc: Trigger: Program termination
@@ -40,7 +40,7 @@ fn=(0) main
 +3 1
 cfi=(2)
 cfn=(2)
-calls=1 +89 
+calls=1 +89
 * 5
 fi=(3) /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/ia32intrin.h
 +80 2
@@ -55,19 +55,19 @@ fe=(1)
 +1 1
 cfi=(2)
 cfn=(6)
-calls=1 195 
+calls=1 195
 * 10
 * 543414
 -1 543414
 +1 543414
 cfi=(2)
 cfn=(6)
-calls=543414 195 
+calls=543414 195
 * 5434140
 +1 1630245
 cfi=(4) /home/kabuto/Programming/HashMap/SRC/func.cpp
 cfn=(8) KDS_HM_FindString32(KDS_HashMap*, char const*)
-calls=543415 446 
+calls=543415 446
 * 62739497
 * 543415
 -2 1086830
@@ -102,13 +102,13 @@ fn=(8)
 -14 2717075
 +14 543415
 cfn=(10)
-calls=543415 87 
+calls=543415 87
 * 16460635
 +3 543415
 -3 543415
 +3 543415
 cfn=(12)
-calls=543415 255 
+calls=543415 255
 * 14830390
 +4 1630245
 -4 543415
@@ -125,7 +125,7 @@ calls=543415 255
 -19 2173648
 cfi=(5) /home/kabuto/Programming/HashMap/SRC//SRC/CmpString.asm
 cfn=(14) 0x0000000000002100
-calls=543412 144 
+calls=543412 144
 * 8151180
 * 1630236
 

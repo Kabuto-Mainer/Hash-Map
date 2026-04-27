@@ -26,9 +26,9 @@ struct KDS_HashMapList {
 };
 
 struct KDS_HashMap {
-    int size;   /* Size of map */
-
     KDS_HashMapList *data;  /* Data hash map */
+
+    int size;   /* Size of map */
 };
 
 struct KDS_TextContext {

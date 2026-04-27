@@ -4,7 +4,7 @@
 #include "common.h"
 #include "func.h"
 
-constexpr int SIZE_TABLE = 18043;
+volatile int SIZE_TABLE = 16384;
 // constexpr int SIZE_STRING = 32;
 constexpr char DATA_FILE[] = "Data/2.txt";
 constexpr char DUMP_FILE[] = "dump.txt";
